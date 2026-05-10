@@ -1,0 +1,225 @@
+import type { SpaceDevsLaunch } from '../types/spacedevs';
+
+const SPACEX: SpaceDevsLaunch['launch_service_provider'] = {
+  id: 121, name: 'SpaceX', abbrev: 'SpX', type: 'Commercial',
+};
+const NASA: SpaceDevsLaunch['launch_service_provider'] = {
+  id: 44, name: 'National Aeronautics and Space Administration', abbrev: 'NASA', type: 'Government',
+};
+const ROCKETLAB: SpaceDevsLaunch['launch_service_provider'] = {
+  id: 147, name: 'Rocket Lab', abbrev: 'RL', type: 'Commercial',
+};
+
+const LC39A = {
+  id: 87, name: 'Launch Complex 39A', map_url: 'https://maps.app.goo.gl/4kzE8H',
+  location: { name: 'Kennedy Space Center, FL, USA', country_code: 'USA', longitude: '-80.6041', latitude: '28.6083' },
+};
+const SLC40 = {
+  id: 80, name: 'Space Launch Complex 40', map_url: 'https://maps.app.goo.gl/3f7T1',
+  location: { name: 'Cape Canaveral SFS, FL, USA', country_code: 'USA', longitude: '-80.5773', latitude: '28.5619' },
+};
+const MAHIA = {
+  id: 96, name: 'Launch Complex 1B', map_url: 'https://maps.app.goo.gl/9kzL2',
+  location: { name: 'Māhia Peninsula, New Zealand', country_code: 'NZL', longitude: '177.8639', latitude: '-39.2609' },
+};
+
+export const MOCK_UPCOMING: SpaceDevsLaunch[] = [
+  {
+    id: 'mock-001',
+    name: 'Falcon 9 | Starlink Group 12-4',
+    status: { id: 1, name: 'Go for Launch', abbrev: 'Go', description: 'Current T-0 is confirmed.' },
+    net: '2026-05-13T02:30:00Z',
+    window_start: '2026-05-13T02:30:00Z',
+    window_end: '2026-05-13T06:30:00Z',
+    mission: {
+      id: 6001, name: 'Starlink Group 12-4', type: 'Communications',
+      description: 'Batch of 23 Starlink v2 Mini satellites to low Earth orbit.',
+      orbit: { name: 'Low Earth Orbit', abbrev: 'LEO' },
+    },
+    rocket: {
+      id: 2001,
+      configuration: { id: 164, name: 'Falcon 9', family: 'Falcon', full_name: 'Falcon 9 Block 5', manufacturer: { name: 'SpaceX', abbrev: 'SpX' } },
+    },
+    launch_service_provider: SPACEX,
+    pad: SLC40,
+    image: 'https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20230805072444.png',
+    vidURLs: [{ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'SpaceX Webcast', description: 'Official SpaceX launch webcast.' }],
+    webcastLive: false,
+    probability: 85,
+    holdreason: null,
+    failreason: null,
+    hashtag: '#Starlink',
+    program: [],
+  },
+  {
+    id: 'mock-002',
+    name: 'Falcon 9 | Crew Dragon — Crew-10',
+    status: { id: 1, name: 'Go for Launch', abbrev: 'Go', description: 'Current T-0 is confirmed.' },
+    net: '2026-05-17T18:45:00Z',
+    window_start: '2026-05-17T18:45:00Z',
+    window_end: '2026-05-17T20:45:00Z',
+    mission: {
+      id: 6002, name: 'Crew-10', type: 'Human Exploration',
+      description: 'Tenth crewed Commercial Crew mission to the International Space Station.',
+      orbit: { name: 'Low Earth Orbit', abbrev: 'LEO' },
+    },
+    rocket: {
+      id: 2001,
+      configuration: { id: 164, name: 'Falcon 9', family: 'Falcon', full_name: 'Falcon 9 Block 5', manufacturer: { name: 'SpaceX', abbrev: 'SpX' } },
+    },
+    launch_service_provider: SPACEX,
+    pad: LC39A,
+    image: 'https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/images/crew2520dragon_image_20230805071831.png',
+    vidURLs: [{ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'SpaceX Webcast', description: 'Official SpaceX launch webcast.' }],
+    webcastLive: false,
+    probability: 90,
+    holdreason: null,
+    failreason: null,
+    hashtag: '#Crew10',
+    program: [{ name: 'Commercial Crew Program', description: 'NASA program for commercial crew transportation to the ISS.' }],
+  },
+  {
+    id: 'mock-003',
+    name: 'Electron | MATS 2',
+    status: { id: 2, name: 'To Be Determined', abbrev: 'TBD', description: 'T-0 is not yet confirmed.' },
+    net: '2026-05-22T10:00:00Z',
+    window_start: '2026-05-22T10:00:00Z',
+    window_end: '2026-05-22T12:00:00Z',
+    mission: {
+      id: 6003, name: 'MATS 2', type: 'Earth Science',
+      description: 'Mesospheric Airglow/Aerosol Tomography and Spectroscopy satellite for atmospheric research.',
+      orbit: { name: 'Sun-Synchronous Orbit', abbrev: 'SSO' },
+    },
+    rocket: {
+      id: 2003,
+      configuration: { id: 26, name: 'Electron', family: 'Electron', full_name: 'Electron', manufacturer: { name: 'Rocket Lab', abbrev: 'RL' } },
+    },
+    launch_service_provider: ROCKETLAB,
+    pad: MAHIA,
+    image: 'https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/images/electron_image_20230807121244.png',
+    vidURLs: [],
+    webcastLive: false,
+    probability: null,
+    holdreason: null,
+    failreason: null,
+    hashtag: null,
+    program: [],
+  },
+  {
+    id: 'mock-004',
+    name: 'Starship | IFT-8',
+    status: { id: 2, name: 'To Be Determined', abbrev: 'TBD', description: 'T-0 is not yet confirmed.' },
+    net: '2026-06-01T15:00:00Z',
+    window_start: '2026-06-01T14:00:00Z',
+    window_end: '2026-06-01T18:00:00Z',
+    mission: {
+      id: 6004, name: 'Integrated Flight Test 8', type: 'Test Flight',
+      description: 'Eighth integrated test flight of the Starship/Super Heavy launch system.',
+      orbit: { name: 'Suborbital', abbrev: 'Sub' },
+    },
+    rocket: {
+      id: 2004,
+      configuration: { id: 457, name: 'Starship', family: 'Starship', full_name: 'Starship', manufacturer: { name: 'SpaceX', abbrev: 'SpX' } },
+    },
+    launch_service_provider: SPACEX,
+    pad: {
+      id: 200, name: 'Starbase Orbital Launch Mount A', map_url: null,
+      location: { name: 'Starbase, TX, USA', country_code: 'USA', longitude: '-97.1560', latitude: '25.9971' },
+    },
+    image: 'https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/images/starship_image_20230809214100.png',
+    vidURLs: [{ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'SpaceX Webcast', description: 'Official SpaceX launch webcast.' }],
+    webcastLive: false,
+    probability: null,
+    holdreason: null,
+    failreason: null,
+    hashtag: '#Starship',
+    program: [],
+  },
+];
+
+export const MOCK_PREVIOUS: SpaceDevsLaunch[] = [
+  {
+    id: 'mock-p001',
+    name: 'Falcon 9 | Starlink Group 11-8',
+    status: { id: 3, name: 'Launch Successful', abbrev: 'Success', description: 'Mission completed successfully.' },
+    net: '2026-05-07T04:12:00Z',
+    window_start: '2026-05-07T04:12:00Z',
+    window_end: '2026-05-07T04:12:00Z',
+    mission: {
+      id: 5901, name: 'Starlink Group 11-8', type: 'Communications',
+      description: 'Batch of 23 Starlink v2 Mini satellites to low Earth orbit.',
+      orbit: { name: 'Low Earth Orbit', abbrev: 'LEO' },
+    },
+    rocket: {
+      id: 2001,
+      configuration: { id: 164, name: 'Falcon 9', family: 'Falcon', full_name: 'Falcon 9 Block 5', manufacturer: { name: 'SpaceX', abbrev: 'SpX' } },
+    },
+    launch_service_provider: SPACEX,
+    pad: SLC40,
+    image: 'https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/images/falcon2520925_image_20230805072444.png',
+    vidURLs: [],
+    webcastLive: false,
+    probability: 95,
+    holdreason: null,
+    failreason: null,
+    hashtag: '#Starlink',
+    program: [],
+  },
+  {
+    id: 'mock-p002',
+    name: 'New Glenn | NG-3',
+    status: { id: 3, name: 'Launch Successful', abbrev: 'Success', description: 'Mission completed successfully.' },
+    net: '2026-04-28T21:00:00Z',
+    window_start: '2026-04-28T21:00:00Z',
+    window_end: '2026-04-28T21:00:00Z',
+    mission: {
+      id: 5902, name: 'NG-3', type: 'Communications',
+      description: 'Third operational New Glenn mission delivering commercial payloads to GTO.',
+      orbit: { name: 'Geostationary Transfer Orbit', abbrev: 'GTO' },
+    },
+    rocket: {
+      id: 2005,
+      configuration: { id: 1022, name: 'New Glenn', family: 'New Glenn', full_name: 'New Glenn', manufacturer: { name: 'Blue Origin', abbrev: 'BO' } },
+    },
+    launch_service_provider: { id: 141, name: 'Blue Origin', abbrev: 'BO', type: 'Commercial' },
+    pad: {
+      id: 201, name: 'Launch Complex 36', map_url: null,
+      location: { name: 'Cape Canaveral SFS, FL, USA', country_code: 'USA', longitude: '-80.5436', latitude: '28.4722' },
+    },
+    image: 'https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/images/new2520glenn_image_20231023172020.png',
+    vidURLs: [],
+    webcastLive: false,
+    probability: 88,
+    holdreason: null,
+    failreason: null,
+    hashtag: null,
+    program: [],
+  },
+  {
+    id: 'mock-p003',
+    name: 'Falcon Heavy | GOES-U',
+    status: { id: 3, name: 'Launch Successful', abbrev: 'Success', description: 'Mission completed successfully.' },
+    net: '2026-04-10T20:26:00Z',
+    window_start: '2026-04-10T20:26:00Z',
+    window_end: '2026-04-10T20:26:00Z',
+    mission: {
+      id: 5903, name: 'GOES-U', type: 'Earth Science',
+      description: 'Geostationary weather satellite for NOAA to enhance storm tracking and monitoring.',
+      orbit: { name: 'Geostationary Orbit', abbrev: 'GEO' },
+    },
+    rocket: {
+      id: 2006,
+      configuration: { id: 161, name: 'Falcon Heavy', family: 'Falcon', full_name: 'Falcon Heavy', manufacturer: { name: 'SpaceX', abbrev: 'SpX' } },
+    },
+    launch_service_provider: SPACEX,
+    pad: LC39A,
+    image: 'https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/images/falcon_heavy_image_20190413080424.jpeg',
+    vidURLs: [],
+    webcastLive: false,
+    probability: 92,
+    holdreason: null,
+    failreason: null,
+    hashtag: '#GOESU',
+    program: [],
+  },
+];

@@ -1,57 +1,74 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/src/lib/theme';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+function TabIcon({ name, color, focused }: { name: IoniconsName; color: string; focused: boolean }) {
+  return <Ionicons name={focused ? name : `${name}-outline` as IoniconsName} size={24} color={color} />;
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textMuted,
+        tabBarStyle: {
+          backgroundColor: Colors.card,
+          borderTopColor: Colors.border,
+          height: Platform.OS === 'ios' ? 84 : 64,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '500',
+        },
+        headerStyle: { backgroundColor: Colors.card },
+        headerTintColor: Colors.textPrimary,
+        headerShadowVisible: false,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          title: 'Inicio',
+          tabBarIcon: ({ color, focused }) => <TabIcon name="rocket" color={color} focused={focused} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="launches"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Lanzamientos',
+          tabBarIcon: ({ color, focused }) => <TabIcon name="calendar" color={color} focused={focused} />,
+          headerTitle: 'Lanzamientos',
+        }}
+      />
+      <Tabs.Screen
+        name="rockets"
+        options={{
+          title: 'Cohetes',
+          tabBarIcon: ({ color, focused }) => <TabIcon name="planet" color={color} focused={focused} />,
+          headerTitle: 'Enciclopedia',
+        }}
+      />
+      <Tabs.Screen
+        name="news"
+        options={{
+          title: 'Noticias',
+          tabBarIcon: ({ color, focused }) => <TabIcon name="newspaper" color={color} focused={focused} />,
+          headerTitle: 'Noticias espaciales',
+        }}
+      />
+      <Tabs.Screen
+        name="favorites"
+        options={{
+          title: 'Favoritos',
+          tabBarIcon: ({ color, focused }) => <TabIcon name="bookmark" color={color} focused={focused} />,
+          headerTitle: 'Mis favoritos',
         }}
       />
     </Tabs>
