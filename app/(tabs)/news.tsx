@@ -2,10 +2,11 @@ import {
   View, Text, FlatList, Image, TouchableOpacity,
   ActivityIndicator, StyleSheet, Linking,
 } from 'react-native';
+import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNews } from '@/src/hooks/useNews';
 import { Colors, Spacing, Radii } from '@/src/lib/theme';
-import type { NewsArticle } from '@/src/types/news';
+import type { NewsArticle, NewsLang } from '@/src/types/news';
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -42,7 +43,8 @@ function ArticleCard({ article }: { article: NewsArticle }) {
 
 export default function NewsScreen() {
   const insets = useSafeAreaInsets();
-  const { articles, loading, loadingMore, error, hasMore, refetch, loadMore } = useNews();
+  const [lang, setLang] = useState<NewsLang>('en');
+  const { articles, loading, loadingMore, error, hasMore, refetch, loadMore } = useNews(lang);
 
   if (loading) {
     return (
@@ -74,7 +76,22 @@ export default function NewsScreen() {
         onEndReached={hasMore ? loadMore : undefined}
         onEndReachedThreshold={0.3}
         ListHeaderComponent={
-          <Text style={styles.header}>Noticias espaciales</Text>
+          <View style={styles.headerRow}>
+            <Text style={styles.header}>Noticias espaciales</Text>
+            <View style={styles.langToggle}>
+              {(['en', 'es'] as NewsLang[]).map(l => (
+                <TouchableOpacity
+                  key={l}
+                  style={[styles.langBtn, lang === l && styles.langBtnActive]}
+                  onPress={() => setLang(l)}
+                >
+                  <Text style={[styles.langBtnText, lang === l && styles.langBtnTextActive]}>
+                    {l.toUpperCase()}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         }
         ListFooterComponent={
           loadingMore ? (
@@ -93,10 +110,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', padding: Spacing.lg,
   },
   list: { paddingHorizontal: Spacing.md, paddingBottom: Spacing.xl },
-  header: {
-    color: Colors.textPrimary, fontSize: 20, fontWeight: '700',
-    marginBottom: Spacing.md,
-  },
   card: {
     backgroundColor: Colors.card,
     borderRadius: Radii.md,
@@ -139,4 +152,21 @@ const styles = StyleSheet.create({
   },
   retryText: { color: Colors.white, fontWeight: '600' },
   footerSpinner: { paddingVertical: Spacing.lg },
+
+  headerRow: {
+    flexDirection: 'row', alignItems: 'center',
+    justifyContent: 'space-between', marginBottom: Spacing.md,
+  },
+  header: { color: Colors.textPrimary, fontSize: 20, fontWeight: '700' },
+  langToggle: {
+    flexDirection: 'row',
+    backgroundColor: Colors.card,
+    borderRadius: Radii.sm,
+    borderWidth: 1, borderColor: Colors.border,
+    overflow: 'hidden',
+  },
+  langBtn: { paddingHorizontal: 12, paddingVertical: 6 },
+  langBtnActive: { backgroundColor: Colors.primary },
+  langBtnText: { color: Colors.textMuted, fontSize: 13, fontWeight: '700' },
+  langBtnTextActive: { color: Colors.white },
 });

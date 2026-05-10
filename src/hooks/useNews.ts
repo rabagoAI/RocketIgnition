@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { NewsArticle, NewsResponse } from '../types/news';
+import type { NewsArticle, NewsResponse, NewsLang } from '../types/news';
 
-const BASE_URL = 'https://api.spaceflightnewsapi.net/v4';
+const SFNA_URL = 'https://api.spaceflightnewsapi.net/v4';
 const PAGE_SIZE = 20;
 
-export function useNews() {
+const SPANISH_NEWS_URL =
+  'https://dgxixxawvlazqauxmvfv.supabase.co/functions/v1/spanish-news';
+
+export function useNews(lang: NewsLang = 'en') {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -14,15 +17,25 @@ export function useNews() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setArticles([]);
+    setNextUrl(null);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      const url = `${BASE_URL}/articles/?limit=${PAGE_SIZE}&ordering=-published_at`;
-      const res = await fetch(url, { signal: controller.signal });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: NewsResponse = await res.json();
-      setArticles(data.results);
-      setNextUrl(data.next);
+      if (lang === 'es') {
+        const res = await fetch(SPANISH_NEWS_URL, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: { articles: NewsArticle[] } = await res.json();
+        setArticles(data.articles);
+        setNextUrl(null);
+      } else {
+        const url = `${SFNA_URL}/articles/?limit=${PAGE_SIZE}&ordering=-published_at`;
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: NewsResponse = await res.json();
+        setArticles(data.results);
+        setNextUrl(data.next);
+      }
     } catch (e) {
       if (e instanceof Error && e.name !== 'AbortError') {
         setError(e.message);
@@ -33,10 +46,10 @@ export function useNews() {
       clearTimeout(timeout);
       setLoading(false);
     }
-  }, []);
+  }, [lang]);
 
   const loadMore = useCallback(async () => {
-    if (!nextUrl || loadingMore) return;
+    if (!nextUrl || loadingMore || lang === 'es') return;
     setLoadingMore(true);
     try {
       const res = await fetch(nextUrl);
@@ -49,7 +62,7 @@ export function useNews() {
     } finally {
       setLoadingMore(false);
     }
-  }, [nextUrl, loadingMore]);
+  }, [nextUrl, loadingMore, lang]);
 
   useEffect(() => { load(); }, [load]);
 

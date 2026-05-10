@@ -18,3 +18,21 @@ export interface NewsResponse {
   previous: string | null;
   results: NewsArticle[];
 }
+
+// ── rss2json (fuentes en español) ─────────────────────────────────────────────
+
+export interface Rss2JsonItem {
+  title: string;
+  link: string;
+  pubDate: string;
+  author: string;
+  thumbnail: string;
+  description: string;
+}
+
+export interface Rss2JsonResponse {
+  status: 'ok' | 'error';
+  items: Rss2JsonItem[];
+}
+
+export type NewsLang = 'en' | 'es';
