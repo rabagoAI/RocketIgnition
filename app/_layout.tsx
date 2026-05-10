@@ -6,6 +6,12 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Colors } from '@/src/lib/theme';
 import { AuthProvider } from '@/src/context/AuthContext';
+import { usePushNotifications } from '@/src/hooks/usePushNotifications';
+
+function NotificationSetup() {
+  usePushNotifications();
+  return null;
+}
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -47,6 +53,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
+        <NotificationSetup />
         <ThemeProvider value={darkTheme}>
           <Stack screenOptions={{ headerStyle: { backgroundColor: Colors.card }, headerTintColor: Colors.textPrimary }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
