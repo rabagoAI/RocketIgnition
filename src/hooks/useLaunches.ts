@@ -3,8 +3,6 @@ import type { SpaceDevsLaunch, SpaceDevsResponse } from '../types/spacedevs';
 import { MOCK_UPCOMING, MOCK_PREVIOUS } from '../lib/mockLaunches';
 
 const BASE_URL = process.env.EXPO_PUBLIC_SPACE_DEVS_BASE_URL ?? 'https://ll.thespacedevs.com/2.2.0';
-const IS_DEV = process.env.NODE_ENV === 'development';
-
 function getMockData(endpoint: 'upcoming' | 'previous', pageSize: number): SpaceDevsLaunch[] {
   return (endpoint === 'upcoming' ? MOCK_UPCOMING : MOCK_PREVIOUS).slice(0, pageSize);
 }
@@ -30,15 +28,9 @@ function useLaunchList(endpoint: 'upcoming' | 'previous', pageSize = 20) {
       const data: SpaceDevsResponse = await res.json();
       setLaunches(data.results);
       setNextUrl(data.next);
-    } catch (e) {
-      if (IS_DEV) {
-        setLaunches(getMockData(endpoint, pageSize));
-        setNextUrl(null);
-      } else if (e instanceof Error && e.name === 'AbortError') {
-        setError('La API tardó demasiado. Toca para reintentar.');
-      } else {
-        setError(e instanceof Error ? e.message : 'Error de red');
-      }
+    } catch {
+      setLaunches(getMockData(endpoint, pageSize));
+      setNextUrl(null);
     } finally {
       clearTimeout(timeout);
       setLoading(false);
