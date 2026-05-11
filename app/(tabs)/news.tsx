@@ -69,7 +69,7 @@ export default function NewsScreen() {
     <View style={styles.container}>
       <FlatList
         data={articles}
-        keyExtractor={item => String(item.id)}
+        keyExtractor={item => item.url || String(item.id)}
         renderItem={({ item }) => <ArticleCard article={item} />}
         contentContainerStyle={[styles.list, { paddingTop: insets.top + Spacing.md }]}
         showsVerticalScrollIndicator={false}

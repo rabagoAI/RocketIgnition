@@ -75,6 +75,7 @@ export default function AdminRocketEditScreen() {
   const [canvasSize, setCanvasSize] = useState({ w: 1, h: 1 });
   const [canvasImageSize, setCanvasImageSize] = useState<{ width: number; height: number } | null>(null);
   const [addingMode, setAddingMode] = useState(false);
+  const [movingComponent, setMovingComponent] = useState<RocketComponentRow | null>(null);
   const [pendingPos, setPendingPos] = useState<{ x: number; y: number } | null>(null);
   const [editingComponent, setEditingComponent] = useState<RocketComponentRow | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -97,7 +98,7 @@ export default function AdminRocketEditScreen() {
   }
 
   function handleCanvasTap(e: any) {
-    if (!addingMode) return;
+    if (!addingMode && !movingComponent) return;
     const { locationX, locationY } = e.nativeEvent;
     const bounds = getImageBounds();
     const relX = locationX - bounds.x;
@@ -105,6 +106,12 @@ export default function AdminRocketEditScreen() {
     if (relX < 0 || relX > bounds.w || relY < 0 || relY > bounds.h) return;
     const xPercent = Math.round((relX / bounds.w) * 100 * 10) / 10;
     const yPercent = Math.round((relY / bounds.h) * 100 * 10) / 10;
+
+    if (movingComponent) {
+      updateComponent(movingComponent.id, { x_percent: xPercent, y_percent: yPercent });
+      setMovingComponent(null);
+      return;
+    }
     setPendingPos({ x: xPercent, y: yPercent });
     setEditingComponent(null);
     setSheetOpen(true);
@@ -269,19 +276,30 @@ export default function AdminRocketEditScreen() {
           {/* Barra de herramientas */}
           <View style={styles.canvasToolbar}>
             <Text style={styles.canvasToolbarLabel}>
-              {addingMode ? '↙ Toca la imagen para añadir un punto' : `${components.length} componentes`}
+              {movingComponent
+                ? `Moviendo: ${movingComponent.name}`
+                : addingMode
+                  ? '↙ Toca la imagen para añadir un punto'
+                  : `${components.length} componentes`}
             </Text>
             <TouchableOpacity
-              style={[styles.addDotBtn, addingMode && styles.addDotBtnActive]}
-              onPress={() => setAddingMode(v => !v)}
+              style={[styles.addDotBtn, (addingMode || !!movingComponent) && styles.addDotBtnActive]}
+              onPress={() => {
+                if (addingMode || movingComponent) {
+                  setAddingMode(false);
+                  setMovingComponent(null);
+                } else {
+                  setAddingMode(true);
+                }
+              }}
             >
               <Ionicons
-                name={addingMode ? 'close-circle' : 'add-circle-outline'}
+                name={(addingMode || !!movingComponent) ? 'close-circle' : 'add-circle-outline'}
                 size={16}
-                color={addingMode ? Colors.warning : Colors.accent}
+                color={(addingMode || !!movingComponent) ? Colors.warning : Colors.accent}
               />
-              <Text style={[styles.addDotBtnText, addingMode && styles.addDotBtnTextActive]}>
-                {addingMode ? 'Cancelar' : 'Añadir punto'}
+              <Text style={[styles.addDotBtnText, (addingMode || !!movingComponent) && styles.addDotBtnTextActive]}>
+                {(addingMode || !!movingComponent) ? 'Cancelar' : 'Añadir punto'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -338,10 +356,14 @@ export default function AdminRocketEditScreen() {
                 </View>
               )}
 
-              {/* Indicador modo añadir */}
-              {addingMode && (
+              {/* Indicador de modo activo */}
+              {(addingMode || !!movingComponent) && (
                 <View style={styles.addModeOverlay}>
-                  <Text style={styles.addModeText}>Toca donde quieres añadir el componente</Text>
+                  <Text style={styles.addModeText}>
+                    {movingComponent
+                      ? `Nueva posición para: ${movingComponent.name}`
+                      : 'Toca donde quieres añadir el componente'}
+                  </Text>
                 </View>
               )}
             </View>
@@ -439,6 +461,11 @@ export default function AdminRocketEditScreen() {
           onSave={handleSaveComponent}
           onDelete={editingComponent ? handleDeleteComponent : undefined}
           onClose={() => { setSheetOpen(false); setEditingComponent(null); setPendingPos(null); }}
+          onMove={editingComponent ? () => {
+            setMovingComponent(editingComponent);
+            setSheetOpen(false);
+            setEditingComponent(null);
+          } : undefined}
           onGenerateAI={generateDescriptions}
         />
       )}

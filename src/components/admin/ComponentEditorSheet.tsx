@@ -26,6 +26,7 @@ interface Props {
   onSave: (data: ComponentFormData) => Promise<void>;
   onDelete?: () => Promise<void>;
   onClose: () => void;
+  onMove?: () => void;
   onGenerateAI: (name: string) => Promise<{
     short_description: string;
     full_description: string;
@@ -35,7 +36,7 @@ interface Props {
 }
 
 export default function ComponentEditorSheet({
-  component, onSave, onDelete, onClose, onGenerateAI,
+  component, onSave, onDelete, onClose, onMove, onGenerateAI,
 }: Props) {
   const { height: SCREEN_H } = useWindowDimensions();
   const SHEET_H = SCREEN_H * 0.88;
@@ -190,6 +191,14 @@ export default function ComponentEditorSheet({
             maxLength={65}
           />
 
+          {/* Mover posición en canvas */}
+          {onMove && (
+            <TouchableOpacity style={styles.moveBtn} onPress={onMove}>
+              <Ionicons name="locate-outline" size={18} color={Colors.accent} />
+              <Text style={styles.moveBtnText}>Mover en canvas</Text>
+            </TouchableOpacity>
+          )}
+
           {/* Acciones */}
           <View style={styles.actions}>
             {onDelete && (
@@ -275,10 +284,22 @@ const styles = StyleSheet.create({
   genBtnDisabled: { opacity: 0.6 },
   genBtnText: { color: Colors.white, fontWeight: '700', fontSize: 14 },
   errorText: { color: Colors.primary, fontSize: 13, marginTop: 6 },
+  moveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: Spacing.xl,
+    paddingVertical: 12,
+    borderRadius: Radii.md,
+    borderWidth: 1,
+    borderColor: Colors.accent,
+  },
+  moveBtnText: { color: Colors.accent, fontWeight: '600', fontSize: 14 },
   actions: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: Spacing.xl,
+    marginTop: Spacing.md,
     alignItems: 'center',
   },
   deleteBtn: {

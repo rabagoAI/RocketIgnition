@@ -54,8 +54,7 @@ export default function LaunchDetailScreen() {
       if (isFavorite) {
         await supabase.from('user_favorites').delete().eq('user_id', user.id).eq('launch_id', id);
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from('user_favorites') as any).insert({ user_id: user.id, launch_id: id });
+        await (supabase as any).from('user_favorites').insert({ user_id: user.id, launch_id: id, launch_name: launch?.name ?? null });
       }
       setIsFavorite(f => !f);
     } finally {

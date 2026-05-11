@@ -14,25 +14,28 @@ App móvil (React Native + Expo) de seguimiento de lanzamientos espaciales con e
 ## Estructura de rutas
 ```
 app/
-  _layout.tsx           — root layout (GestureHandlerRootView + AuthProvider)
+  _layout.tsx               — root layout (GestureHandlerRootView + AuthProvider + NotificationSetup)
   (tabs)/
-    _layout.tsx         — 5 tabs: Inicio, Lanzamientos, Cohetes, Noticias, Favoritos
-    index.tsx           — pantalla inicio con hero countdown
-    launches.tsx        — lista próximos/histórico con filtros
-    rockets.tsx         — grid de cohetes (enciclopedia)
-    news.tsx            — stub (Fase 7)
-    favorites.tsx       — requiere login
-  rocket/[id].tsx       — infografía interactiva del cohete
-  launch/[id].tsx       — detalle completo del lanzamiento
+    _layout.tsx             — 5 tabs: Inicio, Lanzamientos, Cohetes, Noticias, Favoritos
+    index.tsx               — pantalla inicio con hero countdown
+    launches.tsx            — lista próximos/histórico con filtros
+    rockets.tsx             — grid de cohetes (enciclopedia)
+    news.tsx                — feed de noticias EN/ES con toggle de idioma
+    favorites.tsx           — panel de cuenta + acceso a ajustes
+  rocket/[id].tsx           — infografía interactiva del cohete
+  launch/[id].tsx           — detalle completo del lanzamiento
   auth/
     login.tsx
     register.tsx
+  settings/
+    notifications.tsx       — preferencias de notificación (toggles 24h/2h/30min/10min/scrub)
+    profile.tsx             — stub
   admin/
-    index.tsx           — panel admin (solo role=admin)
+    index.tsx               — panel admin (solo role=admin)
     rockets/
-      index.tsx         — lista cohetes admin
-      new.tsx           — crear cohete
-      [id].tsx          — editor completo (datos/imagen/canvas/versiones)
+      index.tsx             — lista cohetes admin
+      new.tsx               — crear cohete
+      [id].tsx              — editor completo (datos/imagen/canvas/versiones)
 ```
 
 ## Fases completadas
@@ -42,19 +45,29 @@ app/
 - **Fase 4** — Lanzamientos: lista con filtros, paginación, detalle completo
 - **Fase 5** — Cohetes: infografía con zoom/pan, puntos interactivos, bottom sheet
 - **Fase 6** — Admin: CRUD cohetes, canvas para colocar puntos, Edge Function IA
-- **Nombre cambiado** de RocketWatch → RocketIgnition
+- **Fase 7** — Noticias EN/ES + Notificaciones push completas
+- **Deploy:** Vercel publicado ✅ · EAS inicializado ✅
 
 ## Base de datos (Supabase)
 - **Proyecto ID:** `dgxixxawvlazqauxmvfv`
 - **URL:** `https://dgxixxawvlazqauxmvfv.supabase.co`
 - **Tablas:** rockets, rocket_versions, rocket_components, user_favorites, notification_preferences, push_tokens
 - **Storage bucket:** `rockets` (público, 10 MB, webp/jpg/png)
-- **Edge Function:** `generate-component` (Claude Haiku)
+- **Edge Functions:**
+  - `generate-component` — Claude Haiku genera descripciones de componentes
+  - `send-launch-notifications` — envía push notifications via Expo Push API (se dispara cada 10 min via pg_cron)
+  - `spanish-news` — proxy RSS que agrega noticias en español de El País, El Mundo, Muy Interesante y Magnet
 - **6 cohetes** en BD: Falcon 9, Starship, Artemis SLS, Ariane 5, Soyuz, New Glenn
 - **32 componentes** con descripciones en 3 niveles + dato clave
 
+## Expo / EAS
+- **Expo account:** rabagoai
+- **Project ID:** `b3128efe-f45e-4c40-bdee-4789a9fc8e16`
+- **EAS CLI:** instalado globalmente (`npm install -g eas-cli`)
+- Para builds nativos: `EXPO_TOKEN=<token> eas build --platform android`
+
 ## Datos mock de lanzamientos
-`src/lib/mockLaunches.ts` — 4 próximos + 3 históricos. Se usan automáticamente si la API falla (tanto en desarrollo como producción).
+`src/lib/mockLaunches.ts` — 4 próximos + 3 históricos. Se usan automáticamente si la API falla (en desarrollo y producción).
 
 ## Variables de entorno (.env — NO subir a git)
 ```
@@ -94,34 +107,22 @@ npx expo start --clear
 - **`i`** — abrir en simulador iOS (solo macOS)
 
 ### Notas importantes
-- El `.env` no está en git. Si clonas el repo en una máquina nueva, créalo manualmente con las variables de arriba.
-- La API de Space Devs puede estar lenta o caída — en ese caso la app usa datos mock automáticamente.
-- Para que el botón "Generar con IA" funcione en el panel admin, hay que añadir `ANTHROPIC_API_KEY` en Supabase Dashboard → Project Settings → Edge Functions → Secrets.
+- El `.env` no está en git. Si clonas el repo en una máquina nueva, créalo manualmente.
+- La API de Space Devs puede estar lenta — la app usa datos mock automáticamente si falla.
+- Las notificaciones push **no funcionan en Expo Go** ni en simulador. Requieren EAS Development Build en dispositivo físico.
+- Para el botón "Generar con IA" en el admin: añadir `ANTHROPIC_API_KEY` en Supabase Dashboard → Project Settings → Edge Functions → Secrets.
 
 ---
 
 ## Tareas pendientes
 
-### Fase 7 — Notificaciones push + Feed de noticias
-- [ ] Configurar Expo Notifications (ya instalado)
-- [ ] Implementar `app/(tabs)/news.tsx` con RSS o API de noticias espaciales
-- [ ] Edge Function para enviar notificaciones push de lanzamientos
-- [ ] Pantalla de ajustes de notificaciones (`notification_preferences`)
-- [ ] Guardar push token en BD al hacer login
-
-### Deploy
-- [ ] Subir a Vercel (web estática)
-  - `vercel.json` ya configurado
-  - Añadir variables de entorno en Vercel Dashboard
-  - Build: `npx expo export --platform web` → output: `dist/`
-- [ ] (Opcional) EAS Build para APK de Android
-
-### Mejoras pendientes menores
-- [ ] Ajustar posiciones (x%/y%) de algunos puntos en los cohetes — usar panel admin → Canvas
+### Mejoras pendientes
+- [ ] Ajustar posiciones (x%/y%) de puntos en los cohetes — usar panel admin → Canvas
 - [ ] Añadir `ANTHROPIC_API_KEY` en Supabase Edge Function Secrets
-- [ ] Imágenes de las versiones de cohete (`rocket_versions.image_url` está vacío)
-- [ ] Pantalla `app/(tabs)/favorites.tsx` — implementar lista real de favoritos del usuario
+- [ ] Imágenes de las versiones de cohete (`rocket_versions.image_url` vacío)
+- [ ] Implementar lista real de favoritos del usuario (lanzamientos y cohetes guardados)
+- [ ] EAS Development Build para probar notificaciones push en dispositivo físico
 
 ### Técnico
-- [ ] Ejecutar `supabase gen types typescript` cuando la API esté estable para eliminar los `as any` en los hooks de Supabase
-- [ ] Considerar alternativa a `react-native-rss-parser` (vulnerabilidad en `xmldom@0.3.0`)
+- [ ] `supabase gen types typescript` para eliminar los `as any` en los hooks de Supabase
+- [ ] Navegar al lanzamiento al tocar una notificación push (handler en usePushNotifications)

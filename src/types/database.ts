@@ -45,6 +45,7 @@ export interface UserFavoriteRow {
   user_id: string;
   rocket_id: string | null;
   launch_id: string | null;
+  launch_name: string | null;
   created_at: string;
 }
 
@@ -111,6 +112,7 @@ export interface UserFavoriteInsert {
   user_id: string;
   rocket_id?: string | null;
   launch_id?: string | null;
+  launch_name?: string | null;
   created_at?: string;
 }
 

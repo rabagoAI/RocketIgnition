@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,8 @@ import ComponentBottomSheet from '@/src/components/rockets/ComponentBottomSheet'
 import VersionSelector from '@/src/components/rockets/VersionSelector';
 import type { RocketComponent } from '@/src/types/database';
 import { Colors, Spacing, Radii } from '@/src/lib/theme';
+import { useAuth } from '@/src/context/AuthContext';
+import { supabase } from '@/src/lib/supabase';
 
 const MIN_SCALE = 0.9;
 const MAX_SCALE = 5;
@@ -37,6 +39,35 @@ export default function RocketInfographicScreen() {
   const insets = useSafeAreaInsets();
   const { width: W, height: H } = useWindowDimensions();
   const { rocket, versions, components, loading, error } = useRocket(id);
+  const { user } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [togglingFav, setTogglingFav] = useState(false);
+
+  useEffect(() => {
+    if (!user || !id) return;
+    supabase
+      .from('user_favorites')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('rocket_id', id)
+      .maybeSingle()
+      .then(({ data }) => setIsFavorite(!!data));
+  }, [user, id]);
+
+  async function toggleFavorite() {
+    if (!user) { router.push('/auth/login'); return; }
+    setTogglingFav(true);
+    try {
+      if (isFavorite) {
+        await (supabase as any).from('user_favorites').delete().eq('user_id', user.id).eq('rocket_id', id);
+      } else {
+        await (supabase as any).from('user_favorites').insert({ user_id: user.id, rocket_id: id });
+      }
+      setIsFavorite(f => !f);
+    } finally {
+      setTogglingFav(false);
+    }
+  }
 
   // Estado de UI
   const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
@@ -158,6 +189,14 @@ export default function RocketInfographicScreen() {
         <Text style={styles.headerTitle} numberOfLines={1}>{rocket.name}</Text>
 
         <View style={styles.headerRight}>
+          {/* Favorito */}
+          <TouchableOpacity onPress={toggleFavorite} style={styles.headerBtn} hitSlop={8} disabled={togglingFav}>
+            {togglingFav
+              ? <ActivityIndicator color={Colors.primary} size="small" />
+              : <Ionicons name={isFavorite ? 'heart' : 'heart-outline'} size={20} color={isFavorite ? Colors.primary : Colors.textSecondary} />
+            }
+          </TouchableOpacity>
+
           {/* Toggle técnico/simple */}
           <TouchableOpacity
             style={[styles.modeToggle, isSimpleMode && styles.modeToggleActive]}

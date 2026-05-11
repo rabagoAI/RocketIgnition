@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
+import { router } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
@@ -84,8 +85,9 @@ export function usePushNotifications() {
     });
     ensureNotificationPreferences(userId);
 
-    const sub = Notifications.addNotificationResponseReceivedListener(() => {
-      // Al tocar la notificación — navegar al lanzamiento en Fase futura
+    const sub = Notifications.addNotificationResponseReceivedListener(response => {
+      const launchId = response.notification.request.content.data?.launchId as string | undefined;
+      if (launchId) router.push(`/launch/${launchId}`);
     });
 
     return () => sub.remove();
